@@ -10,6 +10,7 @@
   "dependencies": {
     "@capacitor/cli": "^6.1.2",
     "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
     "@firebasegen/default": "file:generated/javascript/default",
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
