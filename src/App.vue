@@ -1,12 +1,58 @@
-<!-- src/App.vue -->
 <template>
   <div id="app">
-    <router-view></router-view>
+    <transition name="fade" @after-leave="handleAfterLeave">
+      <router-view v-if="!loading"></router-view>
+    </transition>
+    <transition name="fade">
+      <div v-if="loading" class="loading-indicator"></div>
+    </transition>
   </div>
 </template>
 
 <script>
 export default {
-  name: "App"
+  name: "App",
+  data() {
+    return {
+      loading: false,
+    };
+  },
+  watch: {
+    $route() {
+      this.loading = true; // Show loading indicator on route change
+      // Simulate a delay (remove this in production)
+      setTimeout(() => {
+        this.loading = false; // Hide loading indicator after 1 second
+      }, 1000);
+    },
+  },
+  methods: {
+    handleAfterLeave() {
+      // After the old page has faded out, allow the new page to render
+      this.loading = false;
+    },
+  },
 };
 </script>
+
+<style>
+/* Transition styles */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter,
+.fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  opacity: 0;
+}
+
+/* Loading indicator styles */
+.loading-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5em;
+  color: #333;
+}
+</style>

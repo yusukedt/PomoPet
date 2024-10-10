@@ -1,10 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Login from '../components/LoginPage.vue';
-import Home from '../components/HomePage.vue';
+import MainPage from '../components/MainPage.vue';
+import LoginPage from '../components/LoginPage.vue';
+import RegisterPage from '../components/RegisterPage.vue';
+import HomePage from '../components/HomePage.vue';
 
 const routes = [
-  { path: '/', component: Login },
-  { path: '/home', component: Home }
+  { path: '/', name: 'main', component: MainPage }, // Main page with Login and Sign Up options
+  { path: '/login', name: 'login', component: LoginPage }, // Separate Login page
+  { path: '/register', name: 'register', component: RegisterPage }, // Separate Register page
+  { path: '/home', name: 'home', component: HomePage } // Home page after successful login
 ];
 
 const router = createRouter({
