@@ -89,6 +89,130 @@
   };
   </script>
   
-  <style scoped>
-  @import "../assets/login.css";
-  </style>
+<style>
+/* General Styles */
+.login-page h5 {
+  margin-top: 20px; /* Adjust this value as needed */
+}
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10%;
+  background-image: url('../assets/pexels.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Login Container Class */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 400px; /* Fixed maximum width */
+  width: 100%; /* Ensure the container fits the available width */
+  padding: 2rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1); /* Light translucent color */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px) contrast(0.8); /* Adjusts blur and contrast */
+  color: #333;
+  text-align: center;
+}
+
+/* Input Fields */
+input.form-control {
+  display: block;
+  width: 300px; /* Fill the width of the container */
+  margin: 20px 0;
+  padding: 10px;
+  box-sizing: border-box;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+input.form-control::placeholder {
+  color: #aaa;
+  opacity: 1;
+}
+.login-button {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  padding: 5px;
+  background-color: #6c96c6;
+  color: rgb(255, 255, 255);
+  border: 1px solid black; /* Darker blue border */
+  border-radius: 5px;
+  margin: 15px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover */
+}
+.login-button:hover {
+  background-color: #5d7fa6;
+}
+.login-button.loading {
+  background-color: #cccccc; /* Grey out */
+  color: #666666;
+  border-color: #999999;
+  cursor: not-allowed;
+}
+.login-button:disabled {
+  pointer-events: none;
+}
+.spinner {
+  border: 2px solid #f3f3f3; /* Light gray */
+  border-top: 2px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px; /* Space between spinner and button text */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.error-message {
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+.error-icon {
+  margin-right: 8px;
+  font-size: 18px;
+  display: inline-block;
+}
+.register-prompt {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.create-account-container {
+  text-align: center;
+  margin-top: -0.5rem;
+}
+
+.create-account-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.create-account-link:hover {
+  color: #0056b3; /* Darker shade on hover */
+}
+</style>

@@ -12,7 +12,7 @@
     "@capacitor/core": "^6.1.2",
     "@capacitor/ios": "^6.1.2",
     "@firebasegen/default": "file:generated/javascript/default",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^3.4.1",
     "core-js": "^3.8.3",
     "firebase": "^10.14.0",
     "vue": "^3.2.13",
