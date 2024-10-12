@@ -1,4 +1,5 @@
 <template>
+  <div class="login-page-wrapper">
     <div class="login-page">
       <h2>Welcome</h2>
       <h5>Sign In</h5>
@@ -19,10 +20,11 @@
             <button class="create-account-link" @click="goToRegister">Create an account</button>
         </div>
         <p v-if="error" class="text-danger">
-            <span class="error-icon">🚨</span>{{ error }}
+            <span class="error-icon">⚠️</span>{{ error }}
         </p>
     </div>
-  </template>
+  </div>
+</template>
   
   
   <script>
@@ -53,6 +55,7 @@
         }
   
         try {
+          // Now try to sign
           await signInWithEmailAndPassword(auth, this.identifier, this.password);
           this.$router.push("/home"); // Redirect to home on successful login
           logEvent(analytics, 'login', { method: 'email' });
@@ -78,6 +81,9 @@
           case 'auth/too-many-requests':
             this.error = 'Too many requests. Please try again later.';
             break;
+          case 'auth/invalid-credential':
+            this.error = 'Invalid email or password.';
+            break;
           default:
             this.error = 'An error has occurred. Please try again.';
         }
@@ -89,17 +95,23 @@
   };
   </script>
   
-<style>
+<style scoped>
 /* General Styles */
-.login-page h5 {
-  margin-top: 20px; /* Adjust this value as needed */
+.login-page h2 {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
 }
-body {
+.login-page h5 {
+  margin-top: 10px; /* Adjust this value as needed */
+  font-family: 'Quicksand', sans-serif;
+  font-size: 16px;
+}
+.login-page-wrapper {
   margin: 0;
   height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   padding: 10%;
   background-image: url('../assets/pexels.jpg');
   background-size: cover;
@@ -133,6 +145,7 @@ input.form-control {
   font-size: 16px;
   border: 2px solid #ccc;
   border-radius: 5px;
+  font-family: 'Quicksand', sans-serif;
   background-color: #f9f9f9;
 }
 input.form-control::placeholder {
@@ -148,6 +161,7 @@ input.form-control::placeholder {
   color: rgb(255, 255, 255);
   border: 1px solid black; /* Darker blue border */
   border-radius: 5px;
+  font-family: 'Quicksand', sans-serif;
   margin: 15px 0;
   cursor: pointer;
   transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover */
@@ -186,6 +200,7 @@ input.form-control::placeholder {
   align-items: center;
   justify-content: center;
   margin-top: 10px;
+  font-family: 'Quicksand', sans-serif;
 }
 .error-icon {
   margin-right: 8px;
@@ -195,7 +210,7 @@ input.form-control::placeholder {
 .register-prompt {
   margin-top: 0.5rem;
   text-align: center;
-  font-size: 1.2rem;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .create-account-container {
@@ -210,6 +225,7 @@ input.form-control::placeholder {
   color: #007bff;
   cursor: pointer;
   text-decoration: underline;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .create-account-link:hover {

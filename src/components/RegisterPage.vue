@@ -1,7 +1,8 @@
 <template>
-  <div class="register-page">
-    <h2>Register</h2>
-    <form @submit.prevent="register">
+  <div class="register-page-wrapper">
+    <div class="register-page">
+      <h2>Register</h2>
+      <form @submit.prevent="register">
       <div class="form-group">
         <input type="email" v-model="identifier" class="form-control" id="email" placeholder="Email" required />
       </div>
@@ -12,21 +13,24 @@
         <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         <span v-else>Register</span>
       </button>
-    </form>
-    <p class="login-prompt">Already have an account?</p>
+      </form>
+      <p class="login-prompt">Already have an account?</p>
       <div class="login-container">
       <button class="login-link" @click="goToLogin">Login to your account</button>
-      </div>
+    </div>
+      <p v-if="success" class="text-success">{{ success }}</p>
       <p v-if="error" class="text-danger">
-          <span class="error-icon">⚠️</span>{{ error }}
+        <span class="error-icon">⚠️</span>{{ error }}
       </p>
+    </div>
   </div>
 </template>
 
 <script>
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { logEvent } from "firebase/analytics";
-import { auth, analytics } from "../firebase";
+import { auth, analytics, db } from "../firebase";
+import { setDoc, doc, Timestamp } from "firebase/firestore";
 
 export default {
 data() {
@@ -41,6 +45,7 @@ methods: {
   async register() {
   this.loading = true;
   this.error = '';
+  this.success = '';
   this.identifier = this.identifier.trim();
   this.password = this.password.trim();
 
@@ -61,11 +66,26 @@ methods: {
   }
 
   try {
-      await createUserWithEmailAndPassword(auth, this.identifier, this.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, this.identifier, this.password);
+      const user = userCredential.user;
+
+      // Create a user document in Firestore
+      await setDoc(doc(db, "users", this.identifier), {
+          createdAt: Timestamp.now(),
+          uid: user.uid,
+          email: this.identifier,
+          password: this.password
+      });
       // Log registration success
       logEvent(analytics, 'sign_up', { method: 'email' });
+      this.success = "Your account has been successfully created!";
       this.clearFields();
-      this.goToLogin(); // Redirect to login after successful registration
+
+      // Add delay before navigating
+      setTimeout(() => {
+        this.success = '';
+        this.goToLogin();
+    }, 1200);
   } catch (err) {
       this.handleError(err);
   } finally {
@@ -100,14 +120,18 @@ methods: {
 };
 </script>
 
-<style>
+<style scoped>
 /* General Styles */
-body {
+.register-page h2 {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+}
+.register-page-wrapper {
     margin: 0;
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     padding: 10%;
     background-image: url('../assets/pexels.jpg');
     background-size: cover;
@@ -142,6 +166,7 @@ input.form-control {
     border: 2px solid #ccc;
     border-radius: 5px;
     background-color: #f9f9f9;
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Register Page Specific Button Styles */
@@ -154,6 +179,7 @@ input.form-control {
     color: rgb(255, 255, 255);
     border: 1px solid black;
     border-radius: 5px;
+    font-family: 'Quicksand', sans-serif;
     margin: 15px 0;
     cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover */
@@ -176,6 +202,14 @@ input.form-control {
     margin-right: 8px; /* Space between spinner and button text */
 }
 
+/* Success message */
+.text-success {
+    color: green;
+    font-size: 1rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
 .error-message {
     color: black;
     display: flex;
@@ -194,7 +228,7 @@ input.form-control {
 .login-prompt {
     margin-top: 0.5rem;
     text-align: center;
-    font-size: 1.2rem;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .login-container {
@@ -210,6 +244,7 @@ input.form-control {
     color: #007bff;
     cursor: pointer;
     text-decoration: underline;
+    font-family: 'Quicksand', sans-serif;
 }
 
 .login-link:hover {

@@ -1,8 +1,10 @@
 <template>
-  <div class="main-page">
-    <img src="../assets/mainlogo.png" alt="Logo" class="logo" /> <!-- Replace with your logo path -->
-    <button class="custom-button main-login-button" @click="goToLogin">Login</button>
-    <button class="custom-button main-signup-button" @click="goToRegister">Sign Up</button>
+  <div class="main-page-wrapper">
+    <div class="main-page">
+      <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
+      <button class="custom-button main-login-button" @click="goToLogin">Login</button>
+      <button class="custom-button main-signup-button" @click="goToRegister">Sign Up</button>
+    </div>
   </div>
 </template>
 
@@ -19,8 +21,8 @@ export default {
 };
 </script>
 
-<style>
-body {
+<style scoped>
+.main-page-wrapper {
   margin: 0;
   height: 100vh;
   display: flex; /* Use flexbox */
@@ -55,6 +57,7 @@ body {
   border: 1px solid black;
   border-radius: 5px;
   font-size: 16px;
+  font-family: 'Quicksand', sans-serif;
   transition: background-color 0.3s ease, border-color 0.3s ease, outline 0.3s ease; /* Smooth transition for hover effect */
 }
 .main-login-button {
