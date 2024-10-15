@@ -115,7 +115,7 @@ methods: {
   }
   },
   goToLogin() {
-  this.$router.push('/login'); // Navigate to the login page
+    this.$router.push('/login'); // Navigate to the login page
   },
   goToMain() {
     this.$router.push('/')
