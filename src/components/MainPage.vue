@@ -2,8 +2,10 @@
   <div class="main-page-wrapper">
     <div class="main-page">
       <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
-      <button class="custom-button main-login-button" @click="goToLogin">Login</button>
-      <button class="custom-button main-signup-button" @click="goToRegister">Sign Up</button>
+      <div class="main-page-button">
+        <button class="custom-button main-login-button" @click="goToLogin">Login</button>
+        <button class="custom-button main-signup-button" @click="goToRegister">Sign Up</button>
+      </div>
     </div>
   </div>
 </template>
@@ -27,7 +29,7 @@ export default {
   height: 100vh;
   display: flex; /* Use flexbox */
   justify-content: center; /* Center horizontally */
-  align-items: flex-start; /* Center vertically */
+  align-items: center; /* Center vertically */
   padding: 10%;
   background-image: url('../assets/pexels.jpg');
   background-size: cover;
@@ -35,22 +37,24 @@ export default {
 }
 /* Add a specific class for MainPage */
 .main-page {
+  display: flex;
+  flex-direction: row;
   text-align: center; /* Center the title */
-  width: 100%;
+  align-items: center;
+  width: auto;
 }
-.main-page button {
-  display: block;
-  width: 200px;
-  margin: 20px auto;
+.main-page-button {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
 }
 .logo {
   max-width: 300px;
-  margin-bottom: 10px; /* Space between logo and buttons */
 }
 .custom-button {
-  display: block;
-  width: 200px;
-  margin: 20px auto;
+  /* display: block; */
+  /* margin: 20px auto; */
   padding: 10px;
   background-color: #D6D6E9;
   color: black;
@@ -79,5 +83,29 @@ export default {
 .main-signup-button:active {
   background-color: #9c9cac;
   border-color: black;
+}
+@media (min-width: 768px) {
+  .main-page {
+    flex-direction: row; /* Align logo and buttons horizontally */
+    justify-content: center; /* Center logo and buttons together */
+  }
+
+  .main-page-button {
+    flex-direction: column; /* Stack buttons vertically next to logo */
+    margin-left: 100px; /* Space between logo and buttons */
+    width: 500px;
+  }
+}
+
+/* Stack buttons below logo on smaller screens */
+@media (max-width: 768px) {
+  .main-page {
+    flex-direction: column; /* Stack vertically */
+  }
+
+  .main-page-button {
+    flex-direction: column;
+    width: 200px;
+  }
 }
 </style>

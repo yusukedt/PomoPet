@@ -1,5 +1,10 @@
 <template>
   <div class="register-page-wrapper">
+    <button @click="goToMain" class="back-button" aria-label="Go back">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12H3M12 21l-9-9 9-9"></path>
+      </svg>
+    </button>
     <div class="register-page">
       <h2>Register</h2>
       <form @submit.prevent="register">
@@ -112,6 +117,9 @@ methods: {
   goToLogin() {
   this.$router.push('/login'); // Navigate to the login page
   },
+  goToMain() {
+    this.$router.push('/')
+  },
   clearFields() {
   this.identifier = '';
   this.password = '';
@@ -131,7 +139,7 @@ methods: {
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding: 10%;
     background-image: url('../assets/pexels.jpg');
     background-size: cover;
@@ -249,5 +257,29 @@ input.form-control {
 
 .login-link:hover {
     color: #0056b3;
+}
+
+/* Styles for Back Button */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.back-button:hover {
+  color: #0056b3;
+}
+
+.back-button svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
 }
 </style>

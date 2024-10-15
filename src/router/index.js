@@ -10,7 +10,7 @@ const routes = [
   { path: '/login', name: 'login', component: LoginPage }, // Separate Login page
   { path: '/register', name: 'register', component: RegisterPage }, // Separate Register page
   { path: '/home', name: 'home', component: HomePage }, // Home page after successful login
-  { path: '/timer', name: 'timer', component: TimerPage }
+  { path: '/timer', name: 'timer', component: TimerPage } // Timer page 
 ];
 
 const router = createRouter({

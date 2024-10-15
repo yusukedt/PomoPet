@@ -47,21 +47,22 @@
 .clickable-element {
   position: absolute;
   cursor: pointer;
-  transition: box-shadow 0.3s ease;
-}
-.clickable-element:hover {
-  box-shadow: 0 0 20px rgba(255, 255, 0, 0.8); /* Adjust color and size as needed */
+  transition: filter 0.3s ease;
 }
 
 /* Position the clock specifically */
 .clock {
-  top: 72.5%;
-  left: 55.66%;
+  top: 72.5vh;
+  left: 55.66vw;
 }
 
 .clock-image {
-  width: 88px;
+  width: 5vw;
   height: auto; /* Keeps the aspect ratio */
+  transition: box-shadow 0.3s ease;
 }
 
+.clock-image:hover {
+  filter: drop-shadow(0 0 20px rgba(227, 227, 92, 0.8));
+}
 </style>

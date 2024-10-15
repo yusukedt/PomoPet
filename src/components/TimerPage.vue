@@ -1,7 +1,9 @@
 <!-- src/components/Home.vue -->
 <template>
-    <div>
+    <div class="timer-page-wrapper">
+        <div class="timer-page">
         <h2>Timer Page</h2>
+        </div>
     </div>
 </template>
     
@@ -11,3 +13,16 @@
     };
 </script>
 
+<style scoped>
+.timer-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.timer-page {
+    display: flex;
+}
+</style>
