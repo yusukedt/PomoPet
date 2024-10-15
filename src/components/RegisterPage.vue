@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import { logEvent } from "firebase/analytics";
 import { auth, analytics, db } from "../firebase";
 import { setDoc, doc, Timestamp } from "firebase/firestore";
@@ -85,7 +85,10 @@ methods: {
       logEvent(analytics, 'sign_up', { method: 'email' });
       this.success = "Your account has been successfully created!";
       this.clearFields();
-
+      
+      // Sign out existing user
+      await signOut(auth);
+      
       // Add delay before navigating
       setTimeout(() => {
         this.success = '';

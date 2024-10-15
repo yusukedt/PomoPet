@@ -15,6 +15,10 @@
         <div class="form-group">
           <input type="password" v-model="password" class="form-control" placeholder="Password" required />
         </div>
+        <div class="form-group form-check">
+          <input type="checkbox" v-model="rememberMe" class="form-check-input" id="rememberMe" />
+          <label class="form-check-label" for="rememberMe">Remember Me</label>
+        </div>
         <button type="submit" class="login-button" :disabled="loading">
           <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
           <span v-else>Login</span>
@@ -35,16 +39,48 @@
   <script>
   import { signInWithEmailAndPassword } from "firebase/auth";
   import { logEvent } from "firebase/analytics";
-  import { auth, analytics } from "../firebase";
-  
+  import { auth, analytics, db } from "../firebase";
+  import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';  
+
   export default {
     data() {
       return {
         identifier: '',
         password: '',
         error: '',
-        loading: false
+        loading: false,
+        rememberMe: false
       };
+    },
+    beforeRouteEnter(to, from, next) {
+      const lastLoginTime = localStorage.getItem('lastLoginTime');
+      const rememberedEmail = localStorage.getItem('rememberedEmail');
+
+      if (lastLoginTime && rememberedEmail) {
+        const currentTime = new Date();
+        const hoursSinceLastLogin = (currentTime - new Date(lastLoginTime)) / (1000 * 60 * 60);
+
+        if (hoursSinceLastLogin < 24) {
+          // Check if the user still exists in the Firebase database
+          const userQuery = query(collection(db, 'users'), where('email', '==', rememberedEmail));
+          getDocs(userQuery).then(querySnapshot => {
+            if (!querySnapshot.empty) {
+              // User exists, proceed to home page
+              next('/home');
+            } else {
+              // User does not exist, clear local storage and proceed to login page
+              localStorage.removeItem('rememberedEmail');
+              localStorage.removeItem('lastLoginTime');
+              next();
+            }
+          }).catch(error => {
+            console.error("Error checking user existence:", error);
+            next(); // Proceed to login page if there's an error
+          });
+          return;
+        }
+      }
+      next(); // Proceed to login page if no recent login or user data not found
     },
     methods: {
       async login() {
@@ -62,8 +98,25 @@
         try {
           // Now try to sign
           await signInWithEmailAndPassword(auth, this.identifier, this.password);
+          // Get user data from database
+          const userDoc = await this.getUserData(this.identifier);
+
+          if (this.rememberMe) {
+            const currentTime = new Date();
+            // Store user email and timestamp in localStorage
+            localStorage.setItem('rememberedEmail', this.identifier);
+            localStorage.setItem('lastLoginTime', currentTime.toISOString());
+            
+            // Update last login
+            await updateDoc(doc(db, 'users', userDoc.id), { lastLogin: currentTime });
+          } else {
+            localStorage.removeItem('rememberedEmail');
+            localStorage.removeItem('lastLoginTime');
+          }
+
           this.$router.push("/home"); // Redirect to home on successful login
           logEvent(analytics, 'login', { method: 'email' });
+
         } catch (err) {
           this.handleError(err);
         } finally {
@@ -92,6 +145,15 @@
           default:
             this.error = 'An error has occurred. Please try again.';
         }
+      },
+      async getUserData(email) {
+        const userQuery = query(collection(db, 'users'), where('email', '==', email));
+        const querySnapshot = await getDocs(userQuery);
+
+        if (!querySnapshot.empty) {
+          return querySnapshot.docs[0]; // Return the first matching user document
+        }
+        throw new Error('User not found');
       },
       goToRegister() {
         this.$router.push('/register'); // Navigate to the registration page
@@ -262,5 +324,16 @@ input.form-control::placeholder {
   width: 24px;
   height: 24px;
   stroke: currentColor;
+}
+
+.form-check {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-check-input {
+  margin-bottom: 3.6px;
+  transform: translateX(-6rem);
 }
 </style>

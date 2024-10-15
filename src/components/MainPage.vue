@@ -41,13 +41,20 @@ export default {
   flex-direction: row;
   text-align: center; /* Center the title */
   align-items: center;
-  width: auto;
+  width: 100%;
 }
 .main-page-button {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 20px;
-  margin-top: 20px;
+  padding: 5rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1); /* Light translucent color */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px) contrast(0.8); /* Adjusts blur and contrast */
+  color: #333;
+  text-align: center;
 }
 .logo {
   max-width: 300px;
@@ -93,7 +100,7 @@ export default {
   .main-page-button {
     flex-direction: column; /* Stack buttons vertically next to logo */
     margin-left: 100px; /* Space between logo and buttons */
-    width: 500px;
+    width: 400px;
   }
 }
 
@@ -105,7 +112,7 @@ export default {
 
   .main-page-button {
     flex-direction: column;
-    width: 200px;
+    width: 300px;
   }
 }
 </style>
