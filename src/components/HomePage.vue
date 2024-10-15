@@ -2,7 +2,7 @@
   <div class="home-page-wrapper">
     <div class="background">
       <div class="user-info" @click="toggleDropdown">
-      {{ userEmail }}
+      {{ userEmail || 'User not logged in' }}
       <div v-show="showDropdown" class="dropdown-menu">
         <button @click="logout">Logout</button>
       </div>
@@ -31,6 +31,9 @@ export default {
     const user = auth.currentUser;
     if (user) {
       this.userEmail = user.email;
+    } else {
+      // User is not signed in, redirect to login page
+      this.$router.push('/login');
     }
   },
   methods: {
@@ -44,6 +47,7 @@ export default {
     async logout() {
       try {
         await signOut(auth);
+        this.userEmail ="";
         this.$router.push('/login'); // Redirect to login page after logout
       } catch (error) {
         console.error("Error logging out:", error);

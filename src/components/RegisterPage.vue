@@ -9,10 +9,10 @@
       <h2>Register</h2>
       <form @submit.prevent="register">
       <div class="form-group">
-        <input type="email" v-model="identifier" class="form-control" id="email" placeholder="Email" required />
+        <input type="email" v-model="identifier" class="form-control" id="email" placeholder="Email" required :disabled="loading" />
       </div>
       <div class="form-group">
-        <input type="password" v-model="password" class="form-control" id="password" placeholder="Password" required />
+        <input type="password" v-model="password" class="form-control" id="password" placeholder="Password" required :disabled="loading" />
       </div>
       <button type="submit" class="register-button" :disabled="loading">
         <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -23,8 +23,8 @@
       <div class="login-container">
       <button class="login-link" @click="goToLogin">Login to your account</button>
     </div>
-      <p v-if="success" class="text-success">{{ success }}</p>
-      <p v-if="error" class="text-danger">
+      <p v-if="success" class="text-success" aria-live="polite">{{ success }}</p>
+      <p v-if="error" class="text-danger" aria-live="assertive">
         <span class="error-icon">⚠️</span>{{ error }}
       </p>
     </div>
@@ -43,7 +43,8 @@ data() {
   identifier: '',
   password: '',
   error: '',
-  loading: false
+  loading: false,
+  success: ''
   };
 },
 methods: {
@@ -71,6 +72,9 @@ methods: {
   }
 
   try {
+      // Sign out existing user
+      await signOut(auth);
+      
       const userCredential = await createUserWithEmailAndPassword(auth, this.identifier, this.password);
       const user = userCredential.user;
 
@@ -85,10 +89,7 @@ methods: {
       logEvent(analytics, 'sign_up', { method: 'email' });
       this.success = "Your account has been successfully created!";
       this.clearFields();
-      
-      // Sign out existing user
-      await signOut(auth);
-      
+
       // Add delay before navigating
       setTimeout(() => {
         this.success = '';
@@ -102,6 +103,7 @@ methods: {
   },
   handleError(err) {
   console.error("Error:", err);
+  console.error("Error Code:", err.code);
   // Handle common Firebase error messages
   switch (err.code) {
       case 'auth/email-already-in-use':
@@ -178,6 +180,10 @@ input.form-control {
     border-radius: 5px;
     background-color: #f9f9f9;
     font-family: 'Quicksand', sans-serif;
+}
+input.form-control:disabled {
+    background-color: #e9ecef; /* A light gray color for disabled inputs */
+    cursor: not-allowed; /* Change cursor to indicate disabled state */
 }
 
 /* Register Page Specific Button Styles */
