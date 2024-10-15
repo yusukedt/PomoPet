@@ -74,7 +74,11 @@ methods: {
   try {
       // Sign out existing user
       await signOut(auth);
-      
+
+      // Clear local storage if user is signing up for a new account
+      localStorage.removeItem('rememberedEmail');
+      localStorage.removeItem('lastLoginTime');
+
       const userCredential = await createUserWithEmailAndPassword(auth, this.identifier, this.password);
       const user = userCredential.user;
 

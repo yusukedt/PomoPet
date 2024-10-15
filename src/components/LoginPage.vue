@@ -333,7 +333,7 @@ input.form-control::placeholder {
 }
 
 .form-check-input {
-  margin-bottom: 3.6px;
+  margin-bottom: 4.5px;
   transform: translateX(-6rem);
 }
 </style>
