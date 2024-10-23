@@ -18,8 +18,10 @@ export default {
     };
   },
   watch: {
-    $route() {
+    $route(to) {
       this.loading = true; // Show loading indicator on route change
+      this.updateTitle(to.meta.title); // Update the title based on the route's metadata
+
       // Simulate a delay (remove this in production)
       setTimeout(() => {
         this.loading = false; // Hide loading indicator after 1 second
@@ -30,6 +32,10 @@ export default {
     handleAfterLeave() {
       // After the old page has faded out, allow the new page to render
       this.loading = false;
+    },
+    updateTitle(title) {
+      // Set the document title
+      document.title = `PomoPet - ${title}`;
     },
   },
 };
