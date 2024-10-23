@@ -186,6 +186,7 @@
   background-image: url('../assets/pexels.jpg');
   background-size: cover;
   background-position: center;
+  overflow: hidden;
 }
 
 /* Login Container Class */

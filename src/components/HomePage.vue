@@ -47,8 +47,13 @@ export default {
     async logout() {
       try {
         await signOut(auth);
+        localStorage.removeItem('rememberedEmail');
+        localStorage.removeItem('lastLoginTime');
         this.userEmail ="";
-        this.$router.push('/login'); // Redirect to login page after logout
+        this.showDropdown = false;
+        this.$nextTick(() => {
+          this.$router.push('/login'); // Redirect to login page after logout
+        });
       } catch (error) {
         console.error("Error logging out:", error);
       }
@@ -61,7 +66,7 @@ export default {
 .home-page-wrapper {
     width: 100vw;
     height: 100vh;
-    overflow: auto;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -76,9 +81,14 @@ export default {
   background-repeat: no-repeat;
   background-position: center;
   position: relative;
-  overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .background {
+    background-size: 400%;
+    background-position: 70% 30%;
+  }
+}
 /* Style for the clickable clock element */
 .clickable-element {
   position: absolute;
@@ -88,19 +98,36 @@ export default {
 
 /* Position the clock specifically */
 .clock {
-  top: 72.5vh;
-  left: 55.66vw;
+  position: absolute;
+  top: calc(75.1%); /* You can tweak this to ensure alignment */
+  left: calc(58.6%); /* You can tweak this to ensure alignment */
+  transform: translate(-50%, -50%); /* Center the clock */
 }
+
+@media (max-width: 768px) {
+  .clock {
+    position: absolute;
+    top: calc(75.7%); /* You can tweak this to ensure alignment */
+    left: calc(24.3%); /* You can tweak this to ensure alignment */
+    transform: translate(-50%, -50%); /* Center the clock */
+  }
+}
+
 
 .clock-image {
-  width: 5vw;
+  width: 6vw;
   height: auto; /* Keeps the aspect ratio */
-  transition: box-shadow 0.3s ease;
 }
 
-.clock-image:hover {
-  filter: drop-shadow(0 0 20px rgba(227, 227, 92, 0.8));
+@media (max-width: 768px) {
+  .clock-image {
+    width: 24vw;
+  }
 }
+
+/* .clock-image:hover {
+  filter: drop-shadow(0 0 20px rgba(227, 227, 92, 0.8));
+} */
 
 /* User Info Button */
 .user-info {
@@ -122,6 +149,7 @@ export default {
 }
 
 .dropdown-menu {
+  display: block;
   margin-top: 5px;
   background-color: #fff;
   border: 1px solid #ddd;

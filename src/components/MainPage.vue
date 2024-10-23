@@ -27,6 +27,7 @@ export default {
 .main-page-wrapper {
   margin: 0;
   height: 100vh;
+  width: 100vw;
   display: flex; /* Use flexbox */
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
@@ -34,6 +35,7 @@ export default {
   background-image: url('../assets/pexels.jpg');
   background-size: cover;
   background-position: center;
+  overflow: hidden;
 }
 /* Add a specific class for MainPage */
 .main-page {
@@ -41,7 +43,6 @@ export default {
   flex-direction: row;
   text-align: center; /* Center the title */
   align-items: center;
-  width: 100%;
 }
 .main-page-button {
   display: flex;
