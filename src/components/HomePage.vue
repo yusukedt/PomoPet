@@ -187,11 +187,11 @@ export default {
   position: absolute;
   top: calc(75.1%); /* You can tweak this to ensure alignment */
   left: calc(58.6%); /* You can tweak this to ensure alignment */
-  transform: translate(-50%, -50%); /* Center the clock */
+  transform: translate(-112%, -44%); /* Center the clock */
 }
 
 .clock-image {
-  width: 6vw;
+  width: 59%;
   height: auto; /* Keeps the aspect ratio */
 }
 

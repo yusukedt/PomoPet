@@ -165,6 +165,7 @@ export default {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+  border: 2px solid black;
   border-radius: 10px;
   min-width: 100px;
   background: rgb(255, 255, 255);

@@ -161,7 +161,6 @@ export default {
           localStorage.removeItem("rememberedEmail");
           localStorage.removeItem("lastLoginTime");
         }
-
         this.$router.push("/home"); // Redirect to home on successful login
         logEvent(analytics, "login", { method: "email" });
       } catch (err) {
