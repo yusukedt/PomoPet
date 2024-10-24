@@ -3,8 +3,12 @@
     <div class="main-page">
       <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
       <div class="main-page-button">
-        <button class="custom-button main-login-button" @click="goToLogin">Login</button>
-        <button class="custom-button main-signup-button" @click="goToRegister">Sign Up</button>
+        <button class="custom-button main-login-button" @click="goToLogin">
+          Login
+        </button>
+        <button class="custom-button main-signup-button" @click="goToRegister">
+          Sign Up
+        </button>
       </div>
     </div>
   </div>
@@ -14,12 +18,12 @@
 export default {
   methods: {
     goToLogin() {
-      this.$router.push({ name: 'login' });
+      this.$router.push({ name: "login" });
     },
     goToRegister() {
-      this.$router.push({ name: 'register' });
-    }
-  }
+      this.$router.push({ name: "register" });
+    },
+  },
 };
 </script>
 
@@ -32,7 +36,7 @@ export default {
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
   padding: 10%;
-  background-image: url('../assets/pexels.jpg');
+  background-image: url("../assets/pexels.jpg");
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -64,16 +68,17 @@ export default {
   /* display: block; */
   /* margin: 20px auto; */
   padding: 10px;
-  background-color: #D6D6E9;
+  background-color: #d6d6e9;
   color: black;
   border: 1px solid black;
   border-radius: 5px;
   font-size: 16px;
-  font-family: 'Quicksand', sans-serif;
-  transition: background-color 0.3s ease, border-color 0.3s ease, outline 0.3s ease; /* Smooth transition for hover effect */
+  font-family: "Quicksand", sans-serif;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    outline 0.3s ease; /* Smooth transition for hover effect */
 }
 .main-login-button {
-  background-color: #D6D6E9;
+  background-color: #d6d6e9;
   border-color: black;
 }
 .main-login-button:hover {
@@ -81,7 +86,7 @@ export default {
   border-color: black;
 }
 .main-signup-button {
-  background-color: #D6D6E9;
+  background-color: #d6d6e9;
   border-color: black;
 }
 .main-signup-button:hover {

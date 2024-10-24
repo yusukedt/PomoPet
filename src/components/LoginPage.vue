@@ -1,7 +1,17 @@
 <template>
   <div class="login-page-wrapper">
     <button @click="goToMain" class="back-button" aria-label="Go back">
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="30"
+        height="30"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
         <path d="M21 12H3M12 21l-9-9 9-9"></path>
       </svg>
     </button>
@@ -10,170 +20,210 @@
       <h5>Sign In</h5>
       <form @submit.prevent="login">
         <div class="form-group">
-          <input type="text" v-model="identifier" class="form-control" placeholder="Email" required />
+          <input
+            type="text"
+            v-model="identifier"
+            class="form-control"
+            placeholder="Email"
+            required
+          />
         </div>
         <div class="form-group">
-          <input type="password" v-model="password" class="form-control" placeholder="Password" required />
+          <input
+            type="password"
+            v-model="password"
+            class="form-control"
+            placeholder="Password"
+            required
+          />
         </div>
         <div class="form-group form-check">
-          <input type="checkbox" v-model="rememberMe" class="form-check-input" id="rememberMe" />
+          <input
+            type="checkbox"
+            v-model="rememberMe"
+            class="form-check-input"
+            id="rememberMe"
+          />
           <label class="form-check-label" for="rememberMe">Remember Me</label>
         </div>
         <button type="submit" class="login-button" :disabled="loading">
-          <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span
+            v-if="loading"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
           <span v-else>Login</span>
         </button>
       </form>
       <p class="register-prompt">Don't have an account?</p>
-        <div class="create-account-container">
-            <button class="create-account-link" @click="goToRegister">Create an account</button>
-        </div>
-        <p v-if="error" class="text-danger">
-            <span class="error-icon">⚠️</span>{{ error }}
-        </p>
+      <div class="create-account-container">
+        <button class="create-account-link" @click="goToRegister">
+          Create an account
+        </button>
+      </div>
+      <p v-if="error" class="text-danger">
+        <span class="error-icon">⚠️</span>{{ error }}
+      </p>
     </div>
   </div>
 </template>
-  
-  
-  <script>
-  import { signInWithEmailAndPassword } from "firebase/auth";
-  import { logEvent } from "firebase/analytics";
-  import { auth, analytics, db } from "../firebase";
-  import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';  
 
-  export default {
-    data() {
-      return {
-        identifier: '',
-        password: '',
-        error: '',
-        loading: false,
-        rememberMe: false
-      };
-    },
-    beforeRouteEnter(to, from, next) {
-      const lastLoginTime = localStorage.getItem('lastLoginTime');
-      const rememberedEmail = localStorage.getItem('rememberedEmail');
+<script>
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { logEvent } from "firebase/analytics";
+import { auth, analytics, db } from "../firebase";
+import {
+  doc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
-      if (lastLoginTime && rememberedEmail) {
-        const currentTime = new Date();
-        const hoursSinceLastLogin = (currentTime - new Date(lastLoginTime)) / (1000 * 60 * 60);
+export default {
+  data() {
+    return {
+      identifier: "",
+      password: "",
+      error: "",
+      loading: false,
+      rememberMe: false,
+    };
+  },
+  beforeRouteEnter(to, from, next) {
+    const lastLoginTime = localStorage.getItem("lastLoginTime");
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
 
-        if (hoursSinceLastLogin < 24) {
-          // Check if the user still exists in the Firebase database
-          const userQuery = query(collection(db, 'users'), where('email', '==', rememberedEmail));
-          getDocs(userQuery).then(querySnapshot => {
+    if (lastLoginTime && rememberedEmail) {
+      const currentTime = new Date();
+      const hoursSinceLastLogin =
+        (currentTime - new Date(lastLoginTime)) / (1000 * 60 * 60);
+
+      if (hoursSinceLastLogin < 24) {
+        // Check if the user still exists in the Firebase database
+        const userQuery = query(
+          collection(db, "users"),
+          where("email", "==", rememberedEmail)
+        );
+        getDocs(userQuery)
+          .then((querySnapshot) => {
             if (!querySnapshot.empty) {
               // User exists, proceed to home page
-              next('/home');
+              next("/home");
             } else {
               // User does not exist, clear local storage and proceed to login page
-              localStorage.removeItem('rememberedEmail');
-              localStorage.removeItem('lastLoginTime');
+              localStorage.removeItem("rememberedEmail");
+              localStorage.removeItem("lastLoginTime");
               next();
             }
-          }).catch(error => {
+          })
+          .catch((error) => {
             console.error("Error checking user existence:", error);
             next(); // Proceed to login page if there's an error
           });
-          return;
-        }
-      }
-      next(); // Proceed to login page if no recent login or user data not found
-    },
-    methods: {
-      async login() {
-        this.loading = true;
-        this.error = '';
-        this.identifier = this.identifier.trim();
-        this.password = this.password.trim();
-  
-        if (!this.identifier || !this.password) {
-          this.error = 'Email and password are required.';
-          this.loading = false;
-          return;
-        }
-  
-        try {
-          // Now try to sign
-          await signInWithEmailAndPassword(auth, this.identifier, this.password);
-          // Get user data from database
-          const userDoc = await this.getUserData(this.identifier);
-
-          if (this.rememberMe) {
-            const currentTime = new Date();
-            // Store user email and timestamp in localStorage
-            localStorage.setItem('rememberedEmail', this.identifier);
-            localStorage.setItem('lastLoginTime', currentTime.toISOString());
-            
-            // Update last login
-            await updateDoc(doc(db, 'users', userDoc.id), { lastLogin: currentTime });
-          } else {
-            localStorage.removeItem('rememberedEmail');
-            localStorage.removeItem('lastLoginTime');
-          }
-
-          this.$router.push("/home"); // Redirect to home on successful login
-          logEvent(analytics, 'login', { method: 'email' });
-
-        } catch (err) {
-          this.handleError(err);
-        } finally {
-          this.loading = false;
-        }
-      },
-      handleError(err) {
-        console.error("Error:", err);
-        // Handle common Firebase error messages
-        switch (err.code) {
-          case 'auth/invalid-email':
-            this.error = 'Invalid email address.';
-            break;
-          case 'auth/user-not-found':
-            this.error = 'No user found with this email.';
-            break;
-          case 'auth/wrong-password':
-            this.error = 'Incorrect password. Please try again.';
-            break;
-          case 'auth/too-many-requests':
-            this.error = 'Too many requests. Please try again later.';
-            break;
-          case 'auth/invalid-credential':
-            this.error = 'Invalid email or password.';
-            break;
-          default:
-            this.error = 'An error has occurred. Please try again.';
-        }
-      },
-      async getUserData(email) {
-        const userQuery = query(collection(db, 'users'), where('email', '==', email));
-        const querySnapshot = await getDocs(userQuery);
-
-        if (!querySnapshot.empty) {
-          return querySnapshot.docs[0]; // Return the first matching user document
-        }
-        throw new Error('User not found');
-      },
-      goToRegister() {
-        this.$router.push('/register'); // Navigate to the registration page
-      },
-      goToMain() {
-        this.$router.push('/');
+        return;
       }
     }
-  };
-  </script>
-  
+    next(); // Proceed to login page if no recent login or user data not found
+  },
+  methods: {
+    async login() {
+      this.loading = true;
+      this.error = "";
+      this.identifier = this.identifier.trim();
+      this.password = this.password.trim();
+
+      if (!this.identifier || !this.password) {
+        this.error = "Email and password are required.";
+        this.loading = false;
+        return;
+      }
+
+      try {
+        // Now try to sign
+        await signInWithEmailAndPassword(auth, this.identifier, this.password);
+        // Get user data from database
+        const userDoc = await this.getUserData(this.identifier);
+
+        if (this.rememberMe) {
+          const currentTime = new Date();
+          // Store user email and timestamp in localStorage
+          localStorage.setItem("rememberedEmail", this.identifier);
+          localStorage.setItem("lastLoginTime", currentTime.toISOString());
+
+          // Update last login
+          await updateDoc(doc(db, "users", userDoc.id), {
+            lastLogin: currentTime,
+          });
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.removeItem("lastLoginTime");
+        }
+
+        this.$router.push("/home"); // Redirect to home on successful login
+        logEvent(analytics, "login", { method: "email" });
+      } catch (err) {
+        this.handleError(err);
+      } finally {
+        this.loading = false;
+      }
+    },
+    handleError(err) {
+      console.error("Error:", err);
+      // Handle common Firebase error messages
+      switch (err.code) {
+        case "auth/invalid-email":
+          this.error = "Invalid email address.";
+          break;
+        case "auth/user-not-found":
+          this.error = "No user found with this email.";
+          break;
+        case "auth/wrong-password":
+          this.error = "Incorrect password. Please try again.";
+          break;
+        case "auth/too-many-requests":
+          this.error = "Too many requests. Please try again later.";
+          break;
+        case "auth/invalid-credential":
+          this.error = "Invalid email or password.";
+          break;
+        default:
+          this.error = "An error has occurred. Please try again.";
+      }
+    },
+    async getUserData(email) {
+      const userQuery = query(
+        collection(db, "users"),
+        where("email", "==", email)
+      );
+      const querySnapshot = await getDocs(userQuery);
+
+      if (!querySnapshot.empty) {
+        return querySnapshot.docs[0]; // Return the first matching user document
+      }
+      throw new Error("User not found");
+    },
+    goToRegister() {
+      this.$router.push("/register"); // Navigate to the registration page
+    },
+    goToMain() {
+      this.$router.push("/");
+    },
+  },
+};
+</script>
+
 <style scoped>
 /* General Styles */
 .login-page h2 {
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-weight: bold;
 }
 .login-page h5 {
   margin-top: 10px; /* Adjust this value as needed */
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 16px;
 }
 .login-page-wrapper {
@@ -183,7 +233,7 @@
   justify-content: center;
   align-items: center;
   padding: 10%;
-  background-image: url('../assets/pexels.jpg');
+  background-image: url("../assets/pexels.jpg");
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -216,7 +266,7 @@ input.form-control {
   font-size: 16px;
   border: 2px solid #ccc;
   border-radius: 5px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   background-color: #f9f9f9;
 }
 input.form-control::placeholder {
@@ -232,7 +282,7 @@ input.form-control::placeholder {
   color: rgb(255, 255, 255);
   border: 1px solid black; /* Darker blue border */
   border-radius: 5px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   margin: 15px 0;
   cursor: pointer;
   transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover */
@@ -262,8 +312,12 @@ input.form-control::placeholder {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 .error-message {
   color: black;
@@ -271,7 +325,7 @@ input.form-control::placeholder {
   align-items: center;
   justify-content: center;
   margin-top: 10px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 .error-icon {
   margin-right: 8px;
@@ -281,7 +335,7 @@ input.form-control::placeholder {
 .register-prompt {
   margin-top: 0.5rem;
   text-align: center;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 
 .create-account-container {
@@ -296,7 +350,7 @@ input.form-control::placeholder {
   color: #007bff;
   cursor: pointer;
   text-decoration: underline;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 
 .create-account-link:hover {
