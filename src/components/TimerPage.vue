@@ -1,17 +1,40 @@
-<!-- src/components/Home.vue -->
 <template>
   <div class="timer-page-wrapper">
     <div class="timer-page">
-      <h2>Timer</h2>
-      <div class="timer-display">{{ formatTime(remainingTime) }}</div>
-      <div class="timer-buttons">
-        <button @click="toggleTimer">
-          {{ isRunning ? "Pause" : "Start" }}
-        </button>
-        <button @click="resetTimer">Reset</button>
+      <div class="timer-display-wrapper">
+        <h2 class="session-label">
+          {{ currentMode == "work" ? "Session" : "Break" }}
+        </h2>
+        <!-- Timer Display -->
+        <div class="timer-display">{{ formatTime(remainingTime) }}</div>
+        <div class="timer-buttons">
+          <!-- Timer Buttons -->
+          <button @click="toggleTimer">
+            {{ isRunning ? "Pause" : "Start" }}
+          </button>
+          <button @click="resetTimer">Reset</button>
+        </div>
       </div>
-      <div class="timer-mode">
-        {{ currentMode === "work" ? "Work Time" : "Break Time" }}
+      <!-- Timer Controls -->
+      <div class="timer-control-wrapper">
+        <!-- Break Timer -->
+        <div class="timer-control-break">
+          <h3>Break Length</h3>
+          <div class="control-buttons">
+            <button @click="decreaseBreakDuration">-</button>
+            <span>{{ breakDuration / 60 }}</span>
+            <button @click="increaseBreakDuration">+</button>
+          </div>
+        </div>
+        <div class="timer-control-work">
+          <!-- Session Timer -->
+          <h3>Session Length</h3>
+          <div class="control-buttons">
+            <button @click="decreaseWorkDuration">-</button>
+            <span>{{ workDuration / 60 }}</span>
+            <button @click="increaseWorkDuration">+</button>
+          </div>
+        </div>
       </div>
       <div class="pomodoro-counter">
         Pomodoros Completed: {{ pomodoroCount }}
@@ -21,17 +44,17 @@
 </template>
 
 <script>
-import { db } from '../firebase';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore'; 
-import { getAuth } from 'firebase/auth';
+import { db } from "../firebase";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 export default {
   name: "TimerPage",
   data() {
     return {
-      workDuration: 0.1 * 60, // 25 minutes work
+      workDuration: 25 * 60, // 25 minutes work
       breakDuration: 5 * 60, // 5 minutes rest
-      remainingTime: 0.1 * 60, // Initially set to work duration
+      remainingTime: this.currentMode === "work" ? 25 * 60 : 5 * 60,
       isRunning: false,
       currentMode: "work", // "work" or "break"
       timer: null,
@@ -39,6 +62,7 @@ export default {
     };
   },
   async created() {
+    this.remainingTime = this.workDuration;
     // Load the user's pomodoro count when the component is created
     await this.loadPomodoroCount();
   },
@@ -48,7 +72,7 @@ export default {
       const user = auth.currentUser;
 
       if (user) {
-        const userDoc = doc(db, 'users', user.email);
+        const userDoc = doc(db, "users", user.email);
         const docSnap = await getDoc(userDoc);
 
         if (docSnap.exists()) {
@@ -109,13 +133,13 @@ export default {
       const user = auth.currentUser; // Get the logged-in user
 
       if (user) {
-        const userDoc = doc(db, 'users', user.email); // Reference the user's document
+        const userDoc = doc(db, "users", user.email); // Reference the user's document
 
         await updateDoc(userDoc, {
           pomodoroCount: this.pomodoroCount, // Update the pomodoroCount in Firestore
         });
       } else {
-        console.error('No user is logged in');
+        console.error("No user is logged in");
       }
     },
 
@@ -125,6 +149,35 @@ export default {
       this.isRunning = false;
       this.remainingTime = this.workDuration;
       this.currentMode = "work";
+    },
+
+    // Increase / Decrease durations
+    increaseBreakDuration() {
+      if (this.breakDuration < 60 * 60) this.breakDuration += 60;
+      if (!this.isRunning && this.currentMode === "break") {
+        this.remainingTime = this.breakDuration; // Update remaining time when in break mode
+      }
+    },
+
+    decreaseBreakDuration() {
+      if (this.breakDuration > 60) this.breakDuration -= 60;
+      if (!this.isRunning && this.currentMode === "break") {
+        this.remainingTime = this.breakDuration; // Update remaining time when in break mode
+      }
+    },
+
+    increaseWorkDuration() {
+      if (this.workDuration < 60 * 60) this.workDuration += 60;
+      if (!this.isRunning && this.currentMode === "work") {
+        this.remainingTime = this.workDuration; // Update remaining time when in work mode
+      }
+    },
+
+    decreaseWorkDuration() {
+      if (this.workDuration > 60) this.workDuration -= 60;
+      if (!this.isRunning && this.currentMode === "work") {
+        this.remainingTime = this.workDuration; // Update remaining time when in work mode
+      }
     },
   },
   beforeUnmount() {
@@ -146,9 +199,43 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0);
-  padding: 20px;
+  background-color: #aecdb6;
+  padding: 30px;
   z-index: 10;
+  justify-content: center;
+  align-items: center;
+  width: 50vw;
+  border: 1px solid black;
+  border-radius: 30px;
+}
+
+@media only screen and (orientation: portrait) {
+  .timer-page {
+    width: 80vw;
+    height: 55vh;
+  }
+}
+
+@media only screen and (orientation: landscape) {
+  .timer-page {
+    width: 50vw;
+    height: 60vh;
+  }
+}
+
+.timer-display-wrapper {
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 30px;
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.session-label {
+  font-size: 24px;
+  margin: 0;
 }
 
 .timer-display {
@@ -158,6 +245,7 @@ export default {
 
 .timer-buttons {
   display: flex;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -167,10 +255,15 @@ export default {
   cursor: pointer;
   border: 2px solid black;
   border-radius: 10px;
-  min-width: 100px;
+  min-width: 20%;
   background: rgb(255, 255, 255);
-  transition: background-color 0.3s, transform 0.2s;
-  will-change: transform;
+  transition: transform 0.2s ease-in-out;
+}
+
+@media only screen and (orientation: portrait) {
+  .timer-buttons button {
+    font-size: 10px;
+  }
 }
 
 .timer-buttons button:hover {
@@ -184,9 +277,92 @@ export default {
   color: #555;
 }
 
+.timer-control-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.timer-control-break,
+.timer-control-work {
+  background-color: #9bb6a2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 20px;
+  margin: 5px;
+  gap: 5px;
+}
+
+@media only screen and (orientation: portrait) {
+  .timer-control-break,
+  .timer-control-work {
+    width: 80%;
+  }
+}
+
+.timer-control-break h3,
+.timer-control-work h3 {
+  margin: 0;
+}
+
+@media only screen and (orientation: portrait) {
+  .timer-control-break h3,
+  .timer-control-work h3 {
+    font-size: 14px;
+  }
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-buttons button {
+  background-color: rgba(255, 255, 255, 0);
+  border: 0px;
+  font-size: 20px;
+  color: white;
+  width: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.control-buttons button:hover {
+  transform: scale(1.05);
+}
+
+.control-buttons span {
+  font-size: 18px;
+  padding: 0 5px;
+}
+
+@media only screen and (orientation: portrait) {
+  .control-buttons span {
+    font-size: 14px;
+  }
+}
+
 .pomodoro-counter {
   margin-top: 20px;
   font-size: 20px;
   color: #333;
+}
+
+@media only screen and (orientation: portrait) {
+  .pomodoro-counter {
+    margin-top: 10px;
+    font-size: 16px;
+  }
 }
 </style>

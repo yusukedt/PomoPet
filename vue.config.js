@@ -6,7 +6,7 @@ module.exports = defineConfig({
   pwa: {
     name: 'PomoPet',
     short_name: 'Pomo',
-    themeColor: '#4DBA87',
+    themeColor: '#ffffff',
     background_color: '#ffffff',
     display: 'standalone',
     scope: '/',
