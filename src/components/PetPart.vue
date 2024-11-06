@@ -33,9 +33,9 @@ export default {
   computed: {
     petImage() {
       // Change the image based on growth level
-      if (this.growthLevel >= 3) {
+      if (this.growthLevel >= 5) {
         return require("../assets/tokage1.jpg"); // Image when fully grown
-      } else if (this.growthLevel >= 1) {
+      } else if (this.growthLevel >= 2) {
         return require("../assets/tokage2.jpg"); // Growth stage image
       }
       return require("../assets/tokage3.jpg"); // Baby pet image

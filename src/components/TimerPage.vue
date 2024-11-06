@@ -192,6 +192,7 @@ export default {
   justify-content: center;
   align-items: center;
   text-align: center;
+  height: 100%;
 }
 
 .timer-page {
@@ -199,7 +200,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #aecdb6;
+  background-color: #D6E1B6;
   padding: 30px;
   z-index: 10;
   justify-content: center;
@@ -289,7 +290,7 @@ export default {
 
 .timer-control-break,
 .timer-control-work {
-  background-color: #9bb6a2;
+  background-color: #bdc6a2;
   display: flex;
   flex-direction: column;
   justify-content: center;
