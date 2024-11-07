@@ -11,13 +11,16 @@
           {{ day }}
         </div>
         <div
-          class="calendar-date"
-          v-for="(date, index) in daysInMonth"
+          v-for="(date, index) in calendarDays"
           :key="index"
-          @click="openTodoList(date)"
+          :class="['calendar-date', { 'greyed-out': date.isOtherMonth }]"
+          @click="!date.isOtherMonth && openTodoList(date.date)"
         >
-          {{ date }}
-          <span v-if="hasTasks(date)" class="task-dot"></span>
+          {{ date.date }}
+          <span
+            v-if="!date.isOtherMonth && hasTasks(date.dateString)"
+            class="task-dot"
+          ></span>
         </div>
       </div>
     </div>
@@ -65,7 +68,7 @@ export default {
       currentYear: new Date().getFullYear(),
       currentMonth: new Date().getMonth(),
       daysOfWeek: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-      daysInMonth: [],
+      calendarDays: [],
       monthNames: [
         "January",
         "February",
@@ -95,7 +98,7 @@ export default {
     async fetchTasks() {
       if (auth.currentUser) {
         this.userEmail = auth.currentUser.email;
-        const docRef = doc(db, "users", this.userEmail);
+        const docRef = doc(db, "tasks", this.userEmail);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           this.todoList = docSnap.data().todoList || {};
@@ -107,7 +110,7 @@ export default {
     },
     async saveTasks() {
       if (auth.currentUser) {
-        const docRef = doc(db, "users", this.userEmail);
+        const docRef = doc(db, "tasks", this.userEmail);
         await setDoc(docRef, { todoList: this.todoList }, { merge: true });
       }
     },
@@ -145,15 +148,61 @@ export default {
       }
     },
     updateCalendar() {
+      const firstDayOfMonth = new Date(
+        this.currentYear,
+        this.currentMonth,
+        1
+      ).getDay();
       const daysInCurrentMonth = new Date(
         this.currentYear,
         this.currentMonth + 1,
         0
       ).getDate();
-      this.daysInMonth = Array.from(
-        { length: daysInCurrentMonth },
-        (_, i) => i + 1
-      );
+      const daysInPrevMonth = new Date(
+        this.currentYear,
+        this.currentMonth,
+        0
+      ).getDate();
+
+      this.calendarDays = [];
+
+      // Days from previous month
+      for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+        const date = daysInPrevMonth - i;
+        this.calendarDays.push({
+          date,
+          isOtherMonth: true,
+          dateString: `${String(date).padStart(2, "0")}/${String(
+            this.currentMonth === 0 ? 12 : this.currentMonth
+          ).padStart(2, "0")}/${
+            this.currentMonth === 0 ? this.currentYear - 1 : this.currentYear
+          }`,
+        });
+      }
+
+      // Days in current month
+      for (let date = 1; date <= daysInCurrentMonth; date++) {
+        this.calendarDays.push({
+          date,
+          isOtherMonth: false,
+          dateString: `${String(date).padStart(2, "0")}/${String(
+            this.currentMonth + 1
+          ).padStart(2, "0")}/${this.currentYear}`,
+        });
+      }
+      // Days from next month to complete the grid
+      const remainingDays = 35 - this.calendarDays.length;
+      for (let i = 1; i <= remainingDays; i++) {
+        this.calendarDays.push({
+          date: i,
+          isOtherMonth: true,
+          dateString: `${String(i).padStart(2, "0")}/${String(
+            this.currentMonth === 11 ? 1 : this.currentMonth + 2
+          ).padStart(2, "0")}/${
+            this.currentMonth === 11 ? this.currentYear + 1 : this.currentYear
+          }`,
+        });
+      }
     },
     prevMonth() {
       this.currentMonth = this.currentMonth === 0 ? 11 : this.currentMonth - 1;
@@ -177,11 +226,8 @@ export default {
       this.showModal = false;
       this.newTask = "";
     },
-    hasTasks(date) {
-      const fullDate = `${String(date).padStart(2, "0")}/${String(
-        this.currentMonth + 1
-      ).padStart(2, "0")}/${this.currentYear}`;
-      return this.todoList[fullDate] && this.todoList[fullDate].length > 0;
+    hasTasks(dateString) {
+      return this.todoList[dateString] && this.todoList[dateString].length > 0;
     },
   },
 };
@@ -198,7 +244,7 @@ export default {
   width: 100%;
   max-width: 800px;
   height: fit-content;
-  padding: 10px;
+  padding: 2rem;
 }
 
 .calendar-page {
@@ -216,7 +262,7 @@ export default {
 }
 
 .calendar-header h2 {
-  font-size: 20px;
+  font-size: 2rem;
   margin: 20px;
   font-family: "Quicksand", sans-serif;
   font-weight: bold;
@@ -226,6 +272,7 @@ export default {
   border: 1px solid black;
   border-radius: 5px;
   font-family: "Quicksand", sans-serif;
+  font-size: 1rem;
 }
 
 .calendar-grid {
@@ -241,7 +288,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50px;
+  height: 5vh;
   border: 1px solid #ccc;
   border-radius: 7px;
   font-family: "Quicksand", sans-serif;
@@ -254,7 +301,12 @@ export default {
 
 .calendar-day {
   border: 2px solid #c0c0c0;
-  height: 35px;
+  height: 6vh;
+}
+
+.calendar-date.greyed-out {
+  color: #aaa;
+  background-color: #f0f0f0;
 }
 
 .todolist-wrapper {
@@ -266,6 +318,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10;
 }
 .todolist {
   display: flex;
@@ -279,6 +332,7 @@ export default {
   max-height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
+  z-index: 101;
 }
 
 @media only screen and (orientation: portrait) {
@@ -328,11 +382,11 @@ export default {
 .task-dot {
   position: absolute;
   display: inline-block;
-  bottom: 5px;
+  bottom: 0.3vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
+  width: 0.5rem;
+  height: 0.5rem;
   background-color: #656f78;
   border-radius: 50%;
 }

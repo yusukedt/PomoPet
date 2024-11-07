@@ -57,20 +57,29 @@
         </button>
       </form>
       <p class="register-prompt">Don't have an account?</p>
-      <div class="create-account-container">
+      <div class="account-actions">
         <button class="create-account-link" @click="goToRegister">
           Create an account
+        </button>
+        <button class="forgot-password-link" @click="resetPassword">
+          Forgot Password
         </button>
       </div>
       <p v-if="error" class="text-danger">
         <span class="error-icon">⚠️</span>{{ error }}
+      </p>
+      <p v-if="resetEmailSent" class="text-success">
+        Password reset email sent! Please check your inbox.
       </p>
     </div>
   </div>
 </template>
 
 <script>
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { logEvent } from "firebase/analytics";
 import { auth, analytics, db } from "../firebase";
 import {
@@ -90,6 +99,7 @@ export default {
       error: "",
       loading: false,
       rememberMe: false,
+      resetEmailSent: false,
     };
   },
   beforeRouteEnter(to, from, next) {
@@ -167,6 +177,23 @@ export default {
         this.handleError(err);
       } finally {
         this.loading = false;
+      }
+    },
+    async resetPassword() {
+      this.error = "";
+      this.resetEmailSent = false;
+
+      const email = prompt(
+        "Please enter your email address for password reset."
+      );
+      if (email) {
+        try {
+          await sendPasswordResetEmail(auth, email);
+          this.resetEmailSent = true;
+        } catch (err) {
+          console.error("Error sending password reset email:", err);
+          this.handleError(err);
+        }
       }
     },
     handleError(err) {
@@ -318,12 +345,11 @@ input.form-control::placeholder {
     transform: rotate(360deg);
   }
 }
-.error-message {
-  color: black;
+.text-danger {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 20px;
   font-family: "Quicksand", sans-serif;
 }
 .error-icon {
@@ -337,12 +363,14 @@ input.form-control::placeholder {
   font-family: "Quicksand", sans-serif;
 }
 
-.create-account-container {
+.account-actions {
   text-align: center;
   margin-top: -0.5rem;
+  gap: 10px;
 }
 
-.create-account-link {
+.create-account-link,
+.forgot-password-link {
   padding: 0;
   border: none;
   background: none;
@@ -350,10 +378,18 @@ input.form-control::placeholder {
   cursor: pointer;
   text-decoration: underline;
   font-family: "Quicksand", sans-serif;
+  margin: 0 0.5rem;
 }
 
-.create-account-link:hover {
+.create-account-link:hover,
+.forgot-password-link:hover {
   color: #0056b3; /* Darker shade on hover */
+}
+
+.text-success {
+  color: green;
+  font-family: "Quicksand", sans-serif;
+  margin-top: 20px;
 }
 
 /* Styles for Back Button */

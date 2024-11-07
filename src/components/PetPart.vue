@@ -18,7 +18,7 @@
 <script>
 import { db } from "../firebase";
 import { getAuth } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default {
   name: "PetPart",
@@ -53,12 +53,21 @@ export default {
 
       if (user) {
         const userDoc = doc(db, "users", user.email);
-        const docSnap = await getDoc(userDoc);
+        const petDoc = doc(db, "petInfo", user.email);
+        const userSnap = await getDoc(userDoc);
+        const petSnap = await getDoc(petDoc);
 
-        if (docSnap.exists()) {
-          this.pomodoroCount = docSnap.data().pomodoroCount || 0;
+        if (userSnap.exists()) {
+          this.pomodoroCount = userSnap.data().pomodoroCount || 0;
         } else {
           console.error("User document does not exist");
+        }
+
+        if (petSnap.exists()) {
+          this.foodAmount = petSnap.data().foodAmount || 0;
+          this.growthLevel = petSnap.data().growthLevel || 0;
+        } else {
+          console.error("Pet document does not exist");
         }
       } else {
         console.error("No user is logged in.");
@@ -70,24 +79,24 @@ export default {
       this.foodAmount = cycles * 10; // Example: Each cycle gives 10 food
       this.growthLevel = cycles; // Growth level increases with cycles
 
-      await this.updateDatabase();
+      await this.updatePetInfo();
     },
     async feedPet() {
       if (this.foodAmount > 0) {
         this.foodAmount -= 5;
         this.growthLevel = Math.min(this.growthLevel + 1, 5); // Cap growth level
 
-        await this.updateDatabase();
+        await this.updatePetInfo();
       }
     },
-    async updateDatabase() {
+    async updatePetInfo() {
       const auth = getAuth();
       const user = auth.currentUser;
 
       if (user) {
-        const userDoc = doc(db, "users", user.email);
+        const petDoc = doc(db, "petInfo", user.email);
         try {
-          await updateDoc(userDoc, {
+          await setDoc(petDoc, {
             foodAmount: this.foodAmount,
             growthLevel: this.growthLevel,
           });
@@ -102,7 +111,7 @@ export default {
   },
   async created() {
     await this.fetchPomodoroCount();
-    this.updateFoodAndGrowth(this.pomodoroCount);
+    await this.updateFoodAndGrowth(this.pomodoroCount);
   },
 };
 </script>

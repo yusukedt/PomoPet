@@ -37,7 +37,7 @@
               Tasks
             </button>
           </div>
-          <div v-if="showSidebar" class="sidebar">
+          <div v-if="showSidebar" ref="sidebar" class="sidebar" @click.stop>
             <h3>Tasks for today</h3>
             <div v-if="tasks.length === 0">No tasks for today.</div>
             <ul v-else>
@@ -64,7 +64,7 @@
 <script>
 import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import TimerPage from "./TimerPage.vue";
 import CalendarPage from "./CalendarPage.vue";
 import PetPart from "./PetPart.vue";
@@ -102,6 +102,7 @@ export default {
       // User is not signed in, redirect to login page
       this.$router.push("/login");
     }
+    this.setTaskListener();
   },
   beforeUnmount() {
     // Remove event listener when component is unmounted
@@ -126,16 +127,34 @@ export default {
       if (this.showDropdown && !this.$refs.dropdown.contains(event.target)) {
         this.showDropdown = false;
       }
+      const sidebar = this.$refs.sidebar;
+      if (this.showSidebar && sidebar && !sidebar.contains(event.target)) {
+        this.showSidebar = false;
+      }
     },
     toggleSidebar() {
       this.showSidebar = !this.showSidebar;
       this.fetchTasks();
     },
+    setTaskListener() {
+      if (this.userEmail) {
+        const docRef = doc(db, "tasks", this.userEmail);
+        this.taskListener = onSnapshot(docRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const todoList = docSnap.data().todoList || {};
+            const currentDate = this.formatDate(new Date());
+            this.tasks = todoList[currentDate] || {};
+          } else {
+            this.tasks = [];
+          }
+        });
+      }
+    },
     async fetchTasks() {
       console.log("User Email:", this.userEmail);
       if (this.userEmail) {
         try {
-          const docRef = doc(db, "users", this.userEmail);
+          const docRef = doc(db, "tasks", this.userEmail);
           const docSnap = await getDoc(docRef);
 
           console.log("Document snapshot:", docSnap.data());
@@ -256,6 +275,10 @@ export default {
   padding: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   animation: zoomIn 0.8s forwards;
+  overflow: visible;
+}
+
+.timer-modal {
   overflow: hidden;
 }
 
@@ -427,7 +450,9 @@ export default {
   .sidebar {
     min-width: 95vw;
     max-height: 25vh;
-    overflow: auto;
+    overflow: hidden;
+    overflow-y: auto;
+    clip-path: inset(0 round 40px);
   }
   .sidebar-toggle-button {
     font-size: 10px;
@@ -442,10 +467,11 @@ export default {
   color: white;
   border: 1px solid #ccc;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 0.2rem 0.4rem;
   cursor: pointer;
-  z-index: 10;
+  z-index: 1;
   font-family: "Quicksand", sans-serif;
+  font-size: 1.3rem;
 }
 
 .sidebar {

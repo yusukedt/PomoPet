@@ -192,7 +192,8 @@ export default {
   justify-content: center;
   align-items: center;
   text-align: center;
-  height: 100%;
+  height: 100vh;
+  background-color: #d6e1b6;
 }
 
 .timer-page {
@@ -200,14 +201,12 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #D6E1B6;
-  padding: 30px;
+  background-color: #d6e1b6;
+  padding: 2rem;
   z-index: 10;
   justify-content: center;
   align-items: center;
   width: 50vw;
-  border: 1px solid black;
-  border-radius: 30px;
 }
 
 @media only screen and (orientation: portrait) {
@@ -231,7 +230,6 @@ export default {
   border: 1px solid black;
   border-radius: 30px;
   padding: 10px;
-  margin-top: 20px;
 }
 
 .session-label {
