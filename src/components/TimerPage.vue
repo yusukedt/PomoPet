@@ -204,8 +204,6 @@ export default {
   background-color: #d6e1b6;
   padding: 2rem;
   z-index: 10;
-  justify-content: center;
-  align-items: center;
   width: 50vw;
 }
 
@@ -213,13 +211,6 @@ export default {
   .timer-page {
     width: 80vw;
     height: 55vh;
-  }
-}
-
-@media only screen and (orientation: landscape) {
-  .timer-page {
-    width: 50vw;
-    height: 60vh;
   }
 }
 

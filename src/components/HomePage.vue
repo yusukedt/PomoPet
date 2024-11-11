@@ -272,7 +272,6 @@ export default {
   height: 60vh;
   background-color: white;
   border-radius: 40px;
-  padding: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   animation: zoomIn 0.8s forwards;
   overflow: visible;

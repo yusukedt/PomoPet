@@ -272,7 +272,7 @@ export default {
   border: 1px solid black;
   border-radius: 5px;
   font-family: "Quicksand", sans-serif;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .calendar-grid {

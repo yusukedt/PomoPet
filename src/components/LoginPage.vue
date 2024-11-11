@@ -15,62 +15,64 @@
         <path d="M21 12H3M12 21l-9-9 9-9"></path>
       </svg>
     </button>
-    <div class="login-page">
-      <h2>Welcome</h2>
-      <h5>Sign In</h5>
-      <form @submit.prevent="login">
-        <div class="form-group">
-          <input
-            type="text"
-            v-model="identifier"
-            class="form-control"
-            placeholder="Email"
-            required
-          />
+    <div class="login-logo-wrapper">
+      <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
+      <div class="login-page">
+        <form @submit.prevent="login">
+          <div class="form-group">
+            <input
+              type="text"
+              v-model="identifier"
+              class="form-control"
+              placeholder="Email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              v-model="password"
+              class="form-control"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <div class="form-group form-check">
+            <input
+              type="checkbox"
+              v-model="rememberMe"
+              class="form-check-input"
+              id="rememberMe"
+            />
+            <label class="form-check-label" for="rememberMe">Remember Me</label>
+          </div>
+          <p v-if="error" class="text-danger">
+            <span class="error-icon">⚠️</span>{{ error }}
+          </p>
+          <div class="login-button-wrapper">
+            <button type="submit" class="login-button" :disabled="loading">
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              <span v-else>Login</span>
+            </button>
+            <button class="forgot-password-link" @click="resetPassword">
+              Forgot Password
+            </button>
+            <p v-if="resetEmailSent" class="text-success">
+              Password reset email sent! Please check your inbox.
+            </p>
+          </div>
+        </form>
+        <div class="create-account-container">
+          <button class="create-account-link" @click="goToRegister">
+            New User? Create an account
+          </button>
         </div>
-        <div class="form-group">
-          <input
-            type="password"
-            v-model="password"
-            class="form-control"
-            placeholder="Password"
-            required
-          />
-        </div>
-        <div class="form-group form-check">
-          <input
-            type="checkbox"
-            v-model="rememberMe"
-            class="form-check-input"
-            id="rememberMe"
-          />
-          <label class="form-check-label" for="rememberMe">Remember Me</label>
-        </div>
-        <button type="submit" class="login-button" :disabled="loading">
-          <span
-            v-if="loading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
-          <span v-else>Login</span>
-        </button>
-      </form>
-      <p class="register-prompt">Don't have an account?</p>
-      <div class="account-actions">
-        <button class="create-account-link" @click="goToRegister">
-          Create an account
-        </button>
-        <button class="forgot-password-link" @click="resetPassword">
-          Forgot Password
-        </button>
       </div>
-      <p v-if="error" class="text-danger">
-        <span class="error-icon">⚠️</span>{{ error }}
-      </p>
-      <p v-if="resetEmailSent" class="text-success">
-        Password reset email sent! Please check your inbox.
-      </p>
     </div>
   </div>
 </template>
@@ -243,15 +245,6 @@ export default {
 
 <style scoped>
 /* General Styles */
-.login-page h2 {
-  font-family: "Quicksand", sans-serif;
-  font-weight: bold;
-}
-.login-page h5 {
-  margin-top: 10px; /* Adjust this value as needed */
-  font-family: "Quicksand", sans-serif;
-  font-size: 16px;
-}
 .login-page-wrapper {
   margin: 0;
   height: 100vh;
@@ -259,39 +252,69 @@ export default {
   justify-content: center;
   align-items: center;
   padding: 10%;
-  background-image: url("../assets/pexels.jpg");
+  background-image: linear-gradient(#66b1cc, white);
   background-size: cover;
   background-position: center;
   overflow: hidden;
 }
 
+.login-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media only screen and (orientation: portrait) {
+  .login-logo-wrapper {
+    flex-direction: column;
+  }
+}
+
+@media only screen and (orientation: landscape) {
+  .login-logo-wrapper {
+    gap: 10vw;
+  }
+}
+
+.logo {
+  max-width: 300px;
+}
 /* Login Container Class */
 .login-page {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 400px; /* Fixed maximum width */
-  width: 100%; /* Ensure the container fits the available width */
+  max-width: 400px;
+  width: 100%;
   padding: 2rem;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1); /* Light translucent color */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px) contrast(0.8); /* Adjusts blur and contrast */
+  background: #d2e7ee;
   color: #333;
   text-align: center;
 }
 
+@media only screen and (orientation: portrait) {
+  .login-page {
+    background: rgba(255, 255, 255, 0);
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
 /* Input Fields */
 input.form-control {
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   width: 300px; /* Fill the width of the container */
   margin: 20px 0;
   padding: 10px;
   box-sizing: border-box;
   font-size: 16px;
   border: 2px solid #ccc;
-  border-radius: 5px;
+  border-radius: 40px;
   font-family: "Quicksand", sans-serif;
   background-color: #f9f9f9;
 }
@@ -299,22 +322,31 @@ input.form-control::placeholder {
   color: #aaa;
   opacity: 1;
 }
+
+.login-button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 .login-button {
-  display: block;
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
   min-height: 40px;
   padding: 5px;
-  background-color: #6c96c6;
+  background-color: #66b1cc;
   color: rgb(255, 255, 255);
-  border: 1px solid black; /* Darker blue border */
+  border: none;
   border-radius: 5px;
   font-family: "Quicksand", sans-serif;
-  margin: 15px 0;
+  margin: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover */
 }
 .login-button:hover {
-  background-color: #5d7fa6;
+  background-color: #599db6;
 }
 .login-button.loading {
   background-color: #cccccc; /* Grey out */
@@ -363,13 +395,21 @@ input.form-control::placeholder {
   font-family: "Quicksand", sans-serif;
 }
 
-.account-actions {
+.create-account-container {
   text-align: center;
-  margin-top: -0.5rem;
-  gap: 10px;
 }
 
-.create-account-link,
+.create-account-link {
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-family: "Quicksand", sans-serif;
+}
+
 .forgot-password-link {
   padding: 0;
   border: none;
@@ -381,7 +421,10 @@ input.form-control::placeholder {
   margin: 0 0.5rem;
 }
 
-.create-account-link:hover,
+.create-account-link:hover {
+  background-color: #e6e6e6;
+}
+
 .forgot-password-link:hover {
   color: #0056b3; /* Darker shade on hover */
 }
@@ -418,12 +461,14 @@ input.form-control::placeholder {
 
 .form-check {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
+  padding: 0;
+  gap: 5px;
 }
 
 .form-check-input {
   margin-bottom: 4.5px;
-  transform: translateX(-6rem);
+  position: relative;
 }
 </style>
