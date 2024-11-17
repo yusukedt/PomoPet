@@ -15,53 +15,80 @@
         <path d="M21 12H3M12 21l-9-9 9-9"></path>
       </svg>
     </button>
-    <div class="register-page">
-      <h2>Register</h2>
-      <form @submit.prevent="register">
-        <div class="form-group">
-          <input
-            type="email"
-            v-model="identifier"
-            class="form-control"
-            id="email"
-            placeholder="Email"
-            required
-            :disabled="loading"
-          />
+    <div class="register-logo-wrapper">
+      <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
+      <div class="register-page">
+        <form @submit.prevent="register">
+          <div class="username-bday">
+            <div class="username-input">
+              <input
+                type="text"
+                v-model="username"
+                class="form-control"
+                id="username"
+                placeholder="Username"
+                required
+                :disabled="loading"
+              />
+            </div>
+            <div class="date-input">
+              <input
+                type="date"
+                v-model="birthday"
+                class="form-control"
+                id="birthday"
+                placeholder="dd/mm/yyyy"
+                ref="datepicker"
+                :disabled="loading"
+              />
+            </div>
+          </div>
+          <div class="email-input">
+            <input
+              type="email"
+              v-model="identifier"
+              class="form-control"
+              id="email"
+              placeholder="Email"
+              required
+              :disabled="loading"
+            />
+          </div>
+          <div class="password-input">
+            <input
+              type="password"
+              v-model="password"
+              class="form-control"
+              id="password"
+              placeholder="Password"
+              required
+              :disabled="loading"
+            />
+          </div>
+          <div class="register-button-wrapper">
+            <button type="submit" class="register-button" :disabled="loading">
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              <span v-else>Register</span>
+            </button>
+          </div>
+        </form>
+        <div class="login-container">
+          <button class="login-link" @click="goToLogin">
+            Returning user? Login
+          </button>
         </div>
-        <div class="form-group">
-          <input
-            type="password"
-            v-model="password"
-            class="form-control"
-            id="password"
-            placeholder="Password"
-            required
-            :disabled="loading"
-          />
-        </div>
-        <button type="submit" class="register-button" :disabled="loading">
-          <span
-            v-if="loading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
-          <span v-else>Register</span>
-        </button>
-      </form>
-      <p class="login-prompt">Already have an account?</p>
-      <div class="login-container">
-        <button class="login-link" @click="goToLogin">
-          Login to your account
-        </button>
+        <p v-if="success" class="text-success" aria-live="polite">
+          {{ success }}
+        </p>
+        <p v-if="error" class="text-danger" aria-live="assertive">
+          <span class="error-icon">⚠️</span>{{ error }}
+        </p>
       </div>
-      <p v-if="success" class="text-success" aria-live="polite">
-        {{ success }}
-      </p>
-      <p v-if="error" class="text-danger" aria-live="assertive">
-        <span class="error-icon">⚠️</span>{{ error }}
-      </p>
     </div>
   </div>
 </template>
@@ -71,16 +98,28 @@ import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import { logEvent } from "firebase/analytics";
 import { auth, analytics, db } from "../firebase";
 import { setDoc, doc, Timestamp } from "firebase/firestore";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.css";
 
 export default {
   data() {
     return {
+      username: "",
+      birthday: "",
       identifier: "",
       password: "",
       error: "",
       loading: false,
       success: "",
     };
+  },
+  mounted() {
+    flatpickr(this.$refs.datepicker, {
+      dateFormat: "d/m/Y", // Display format
+      maxDate: "today", // Disable future dates
+      allowInput: true, // Allow manual input
+      appendTo: document.body, // Append the calendar to the body
+    });
   },
   methods: {
     async register() {
@@ -90,6 +129,16 @@ export default {
       this.identifier = this.identifier.trim();
       this.password = this.password.trim();
 
+      if (!this.username.trim()) {
+        this.error = "Username is required.";
+        this.loading = false;
+        return;
+      }
+      if (!this.birthday) {
+        this.error = "Please select your birthday.";
+        this.loading = false;
+        return;
+      }
       if (!this.identifier || !this.password) {
         this.error = "Email and password are required.";
         this.loading = false;
@@ -125,8 +174,10 @@ export default {
         await setDoc(doc(db, "users", this.identifier), {
           createdAt: Timestamp.now(),
           uid: user.uid,
+          username: this.username,
           email: this.identifier,
           password: this.password,
+          birthday: this.birthday,
         });
         // Log registration success
         logEvent(analytics, "sign_up", { method: "email" });
@@ -178,21 +229,38 @@ export default {
 
 <style scoped>
 /* General Styles */
-.register-page h2 {
-  font-family: "Quicksand", sans-serif;
-  font-weight: bold;
-}
 .register-page-wrapper {
   margin: 0;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10%;
-  background-image: url("../assets/pexels.jpg");
+  background-image: linear-gradient(#66b1cc, white);
   background-size: cover;
   background-position: center;
   overflow: hidden;
+}
+
+.register-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media only screen and (orientation: portrait) {
+  .register-logo-wrapper {
+    flex-direction: column;
+  }
+}
+
+@media only screen and (orientation: landscape) {
+  .register-logo-wrapper {
+    gap: 10vw;
+  }
+}
+
+.logo {
+  max-width: 300px;
 }
 
 /* Register Container Class */
@@ -201,53 +269,96 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 400px; /* Fixed maximum width */
-  width: 100%; /* Ensure the container fits the available width */
+  max-width: 350px;
+  width: fit-content;
+  height: auto;
   padding: 2rem;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1); /* Light translucent color */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px) contrast(0.8); /* Adjusts blur and contrast */
+  background: #d2e7ee;
   color: #333;
   text-align: center;
 }
 
+@media only screen and (orientation: portrait) {
+  .register-page {
+    background: rgba(255, 255, 255, 0);
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
 /* Input Fields */
 input.form-control {
-  display: block;
-  width: 300px; /* Fill the width of the container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%; /* Fill the width of the container */
   margin: 20px 0;
+  height: 40px;
   padding: 10px;
   box-sizing: border-box;
   font-size: 16px;
   border: 2px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  border-radius: 40px;
   font-family: "Quicksand", sans-serif;
-}
-input.form-control:disabled {
-  background-color: #e9ecef; /* A light gray color for disabled inputs */
-  cursor: not-allowed; /* Change cursor to indicate disabled state */
+  background-color: #f9f9f9;
 }
 
+input.form-control::placeholder {
+  color: #aaa;
+  opacity: 1;
+}
+
+.username-bday input.form-control {
+  width: 100%;
+  margin: 0;
+}
+
+birthday.form-control {
+  padding: 0;
+}
+
+.username-bday {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+}
+
+input[type="date"].form-control {
+  position: relative;
+  appearance: none; /* Removes native styling for consistency */
+  -webkit-appearance: none; /* Ensures compatibility with WebKit browsers */
+}
+
+.register-button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 /* Register Page Specific Button Styles */
 .register-button {
-  display: block;
-  width: 100%; /* Fill the width of the container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
   min-height: 40px;
   padding: 5px;
-  background-color: #6c96c6;
+  background-color: #66b1cc;
   color: rgb(255, 255, 255);
-  border: 1px solid black;
+  border: none;
   border-radius: 5px;
   font-family: "Quicksand", sans-serif;
-  margin: 15px 0;
+  margin: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover */
 }
 
 .register-button:hover {
-  background-color: #5d7fa6;
+  background-color: #599db6;
 }
 
 /* Spinner and Error Messages */
@@ -294,17 +405,17 @@ input.form-control:disabled {
 
 .login-container {
   text-align: center;
-  margin-top: -0.5rem;
 }
 
 /* Login Link */
 .login-link {
-  padding: 0;
-  border: none;
-  background: none;
-  color: #007bff;
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
   cursor: pointer;
-  text-decoration: underline;
+  margin-top: 15px;
   font-family: "Quicksand", sans-serif;
 }
 

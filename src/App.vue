@@ -42,16 +42,6 @@ export default {
 </script>
 
 <style>
-/* Transition styles */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
 /* Loading indicator styles */
 .loading-indicator {
   position: fixed;

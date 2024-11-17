@@ -19,7 +19,7 @@
       <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
       <div class="login-page">
         <form @submit.prevent="login">
-          <div class="form-group">
+          <div class="email-input">
             <input
               type="text"
               v-model="identifier"
@@ -28,7 +28,7 @@
               required
             />
           </div>
-          <div class="form-group">
+          <div class="password-input">
             <input
               type="password"
               v-model="password"
@@ -37,7 +37,7 @@
               required
             />
           </div>
-          <div class="form-group form-check">
+          <div class="checkbox-input form-check">
             <input
               type="checkbox"
               v-model="rememberMe"
@@ -244,6 +244,7 @@ export default {
 </script>
 
 <style scoped>
+
 /* General Styles */
 .login-page-wrapper {
   margin: 0;
@@ -251,7 +252,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10%;
   background-image: linear-gradient(#66b1cc, white);
   background-size: cover;
   background-position: center;
@@ -285,8 +285,9 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 400px;
-  width: 100%;
+  max-width: 350px;
+  width: fit-content;
+  height: auto;
   padding: 2rem;
   border-radius: 10px;
   background: #d2e7ee;
@@ -308,8 +309,9 @@ input.form-control {
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 300px; /* Fill the width of the container */
+  width: 310px; /* Fill the width of the container */
   margin: 20px 0;
+  height: 40px;
   padding: 10px;
   box-sizing: border-box;
   font-size: 16px;
