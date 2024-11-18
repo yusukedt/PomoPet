@@ -1,7 +1,7 @@
 <template>
   <div class="main-page-wrapper">
     <div class="main-page">
-      <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
+      <img src="../assets/pomopet.png" alt="Logo" class="logo" />
       <div class="main-page-button">
         <button class="custom-button main-login-button" @click="goToLogin">
           Login
@@ -31,12 +31,10 @@ export default {
 .main-page-wrapper {
   margin: 0;
   height: 100vh;
-  width: 100vw;
-  display: flex; /* Use flexbox */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  padding: 10%;
-  background-image: url("../assets/pexels.jpg");
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(#66b1cc, white);
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -55,49 +53,53 @@ export default {
   gap: 20px;
   padding: 5rem;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1); /* Light translucent color */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px) contrast(0.8); /* Adjusts blur and contrast */
+  background: linear-gradient(#aee1f1, #d2e5eb);
   color: #333;
   text-align: center;
 }
+@media only screen and (orientation: portrait) {
+  .main-page-button {
+    background: rgba(255, 255, 255, 0);
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+}
+
 .logo {
   max-width: 300px;
 }
 .custom-button {
-  /* display: block; */
-  /* margin: 20px auto; */
   padding: 10px;
-  background-color: #d6d6e9;
+  background-color: #66b1cc;
   color: black;
   border: 1px solid black;
   border-radius: 5px;
   font-size: 16px;
   font-family: "Quicksand", sans-serif;
   transition: background-color 0.3s ease, border-color 0.3s ease,
-    outline 0.3s ease; /* Smooth transition for hover effect */
+    outline 0.3s ease;
 }
 .main-login-button {
-  background-color: #d6d6e9;
+  background-color: #66b1cc;
   border-color: black;
 }
 .main-login-button:hover {
-  background-color: #b8b8ca;
+  background-color: #599db6;
   border-color: black;
 }
 .main-signup-button {
-  background-color: #d6d6e9;
+  background-color: #66b1cc;
   border-color: black;
 }
 .main-signup-button:hover {
-  background-color: #b8b8ca;
+  background-color: #599db6;
   border-color: black;
 }
 .main-signup-button:active {
-  background-color: #9c9cac;
+  background-color: rgb(142, 142, 158);
   border-color: black;
 }
-@media (min-width: 768px) {
+@media only screen and (orientation: landscape) {
   .main-page {
     flex-direction: row; /* Align logo and buttons horizontally */
     justify-content: center; /* Center logo and buttons together */
@@ -111,7 +113,7 @@ export default {
 }
 
 /* Stack buttons below logo on smaller screens */
-@media (max-width: 768px) {
+@media only screen and (orientation: portrait) {
   .main-page {
     flex-direction: column; /* Stack vertically */
   }

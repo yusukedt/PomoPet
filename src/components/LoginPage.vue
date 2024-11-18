@@ -16,7 +16,7 @@
       </svg>
     </button>
     <div class="login-logo-wrapper">
-      <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
+      <img src="../assets/pomopet.png" alt="Logo" class="logo" />
       <div class="login-page">
         <form @submit.prevent="login">
           <div class="email-input">
@@ -467,6 +467,7 @@ input.form-control::placeholder {
   align-items: center;
   padding: 0;
   gap: 5px;
+  margin-bottom: 10px;
 }
 
 .form-check-input {

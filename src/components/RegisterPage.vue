@@ -16,7 +16,7 @@
       </svg>
     </button>
     <div class="register-logo-wrapper">
-      <img src="../assets/mainlogo.png" alt="Logo" class="logo" />
+      <img src="../assets/pomopet.png" alt="Logo" class="logo" />
       <div class="register-page">
         <form @submit.prevent="register">
           <div class="username-bday">
