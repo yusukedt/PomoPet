@@ -310,7 +310,7 @@ input.form-control {
   align-items: center;
   text-align: center;
   width: 310px; /* Fill the width of the container */
-  margin: 20px 0;
+  margin-bottom: 20px;
   height: 40px;
   padding: 10px;
   box-sizing: border-box;

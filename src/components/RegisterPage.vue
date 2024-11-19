@@ -415,12 +415,12 @@ input[type="date"].form-control {
   border: 2px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: 5px;
   font-family: "Quicksand", sans-serif;
 }
 
 .login-link:hover {
-  color: #0056b3;
+  background-color: #e6e6e6;
 }
 
 /* Styles for Back Button */
